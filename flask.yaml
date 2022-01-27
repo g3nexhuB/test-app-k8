@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flask
-        image: tiangolo/uwsgi-nginx-flask 
+        image: flask-image
         ports:
           - containerPort: 80
 ---
