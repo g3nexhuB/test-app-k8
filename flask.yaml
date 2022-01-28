@@ -21,7 +21,7 @@ spec:
         app: hello-world-deployment
     spec:
       containers:
-      - image: g3nex/hello-world-angel
+      - image: g3nex/hello-world-default
         imagePullPolicy: Always
         name: hello-world
         resources: {}
