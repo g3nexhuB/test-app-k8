@@ -15,3 +15,6 @@ The Stages:
 6. Image  save to https://hub.docker.com/repository/docker/g3nex/flask-app
 7. ProvisionDeploy login  to dockerhub and pull the image and run the image into the remote host
 
+
+Azure Pipeline yaml build with ansible roles  and templates
+the same stages from Jenkinsfile/jenkins pipelines

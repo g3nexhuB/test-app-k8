@@ -1,0 +1,55 @@
+
+
+parameters:
+
+- name: serverName
+  displayName: Server Names separated with comma
+  type: string
+  default: '-'
+
+- name: appImage
+  displayName: app Image
+  type: string
+  default: '-'
+
+stages:
+- stage: verify
+  displayName: 'verify'
+  jobs:
+  - job: verify
+    displayName: test
+    pool: ansible
+    steps:
+    - script: |
+        whoami; ls -lhtr
+      name: test
+
+  - job: init
+    displayName: "Deploy image"
+    pool: ansible
+    environment: approval-checks
+    steps:
+    - checkout: self
+    - task: AzureKeyVault@1
+      displayName: "Fetch ssh-key from the Key Vault"
+      inputs:
+        azureSubscription: "itops-automation"
+        KeyVaultName: itops-wright-kv
+        SecretsFilter: "azurekey"
+    - script: |
+        echo "Copy Keyvault Secret test-sshkey content into file ssh.key"
+        echo "$ssh_key_content" > ssh.key
+        chmod 0600 "ssh.key"
+        md5sum ssh.key
+      displayName: "Copy SSH Key"
+      env:
+        ssh_key_content: $(azurekey)
+    - script: |
+        echo "build group vars"
+        echo "---" >$(System.DefaultWorkingDirectory)/sftp_roles/group_vars/all
+        echo -e "dockerhub_pwd: "$(dockerhub_pwd) >> $(System.DefaultWorkingDirectory)/sftp_roles/group_vars/all
+        echo -e "dockerhub_usr: "$(dockerhub_usr) >> $(System.DefaultWorkingDirectory)/sftp_roles/group_vars/all        
+        ansible-playbook app-deployment-azure-ansible/deploy-app-agent.yml -t "verifycontainer, curl" -i hosts.ini
+    
+      displayName: 'Verify'
+

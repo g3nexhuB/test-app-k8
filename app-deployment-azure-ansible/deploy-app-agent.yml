@@ -1,0 +1,51 @@
+---
+- name: Deployment of app
+  hosts: local
+  become: true
+
+  tasks:
+    - name: Clone repo
+      ansible.builtin.git:
+        repo: https://github.com/g3nexhuB/test-app-k8.git
+        dest: /home/azureuser
+        single_branch: yes
+        version: main
+      tags: clone
+
+    - name: Build Image
+      shell: " docker build -t flask-app . "
+      tags: build
+
+    - name: Verify Images
+      shell: "docker images -a"
+      register: images
+    - debug: var=images.stdout_lines
+      tags: verifyimage
+
+    - name: Docker Run
+      shell: " docker run -it --rm -d -p 5000:5000 --name flask-app flask-app "
+      tags: run
+
+    - name: Verify Container
+      shell: "docker ps -a"
+      register: container
+    - debug: var=container.stdout_lines
+      tags: verifycontainer
+
+    - name: Test the root path
+      shell: "curl localhost:5000 2>&1"
+      register: curl
+    - debug: var=curl.stdout_lines
+      tags: curl
+
+    - name: Docker tag
+      shell: " docker tag flask-app g3nex/flask-app "
+      tags: tag
+
+    - name: Docker Login
+      shell: "echo {{ dockerhub_pwd }} | sudo docker login -u {{ dockerhub_usr }}  --password-stdin"
+      tags: login
+
+    - name: Docker Push
+      shell: "docker push g3nex/flask-app"
+      tags: push

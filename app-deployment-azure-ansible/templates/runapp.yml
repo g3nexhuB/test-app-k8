@@ -1,0 +1,52 @@
+
+
+parameters:
+
+- name: serverName
+  displayName: Server Names separated with comma
+  type: string
+  default: '-'
+
+- name: appImage
+  displayName: app Image
+  type: string
+  default: '-'
+
+stages:
+- stage: run_app
+  displayName: 'Run App'
+  jobs:
+  - job: run_app
+    displayName: test
+    pool: ansible
+    steps:
+    - script: |
+        whoami; ls -lhtr
+      name: test
+
+  - job: init
+    displayName: "Deploy image"
+    pool: ansible
+    environment: approval-checks
+    steps:
+    - checkout: self
+    - task: AzureKeyVault@1
+      displayName: "Fetch ssh-key from the Key Vault"
+      inputs:
+        azureSubscription: "itops-automation"
+        KeyVaultName: itops-wright-kv
+        SecretsFilter: "azurekey"
+    - script: |
+        echo "Copy Keyvault Secret test-sshkey content into file ssh.key"
+        echo "$ssh_key_content" > ssh.key
+        chmod 0600 "ssh.key"
+        md5sum ssh.key
+      displayName: "Copy SSH Key"
+      env:
+        ssh_key_content: $(azurekey)
+    - script: |
+        
+        ansible-playbook app-deployment-azure-ansible/deploy-app-agent.yml -t "run" -i hosts.ini
+    
+      displayName: 'Run container in agent'
+

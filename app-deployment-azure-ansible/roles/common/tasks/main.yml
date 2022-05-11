@@ -1,0 +1,20 @@
+- name: Docker Login and pulls
+  shell: "echo {{ dockerhub_pwd }} | sudo docker login -u {{ dockerhub_usr }}  --password-stdin && docker pull g3nex/flask-apps"
+  tags: login_and_pull
+
+- name: Docker Run Container
+  shell: "docker run -it --rm -d -p 5000:5000 --name app flask-app-deploy"
+  tags: run
+
+- name: Verify Container
+  shell: "docker ps -a"
+  register: container
+- debug: var=container.stdout_lines
+  tags: verifycontainer
+
+- name: Test the root path
+  shell: "curl localhost:5000 2>&1"
+  register: curl
+- debug: var=curl.stdout_lines
+  tags: curl
+

@@ -1,0 +1,58 @@
+trigger: none
+
+
+parameters:
+- name: serverName
+  displayName: Server Names
+  type: string
+  default: '-'
+
+- name: appImage
+  displayName: app Image
+  type: string
+  default: '-'
+
+pool:
+  name: ansible
+  demands:
+  - agent.name -equals auxl-ansible-vm-1
+
+stages:
+- stage: parameters
+  displayName: Print Parameters
+  jobs:
+  - job: parameters
+    displayName: check parameters
+    steps:
+    - checkout: none
+    - script: |
+
+        echo Server Name: \'${{ parameters.serverName }}\'
+        echo upload Package Name: \'${{ parameters.appImage }}\'
+
+      displayName: Check parameters
+
+- template: templates/pullimage.yml
+  parameters:
+    serverName: ${{ parameters.serverName }}
+    appImage: ${{ parameters.appImage }}
+
+- template: templates/runapp.yml
+  parameters:
+    serverName: ${{ parameters.serverName }}
+    appImage: ${{ parameters.appImage }}
+
+- template: templates/verifycurl.yml
+  parameters:
+    serverName: ${{ parameters.serverName }}
+    appImage: ${{ parameters.appImage }}
+
+- template: templates/pushimage.yml
+  parameters:
+    serverName: ${{ parameters.serverName }}
+    appImage: ${{ parameters.appImage }}
+
+- template: templates/provisiondeploy.yml
+  parameters:
+    serverName: ${{ parameters.serverName }}
+    appImage: ${{ parameters.appImage }}

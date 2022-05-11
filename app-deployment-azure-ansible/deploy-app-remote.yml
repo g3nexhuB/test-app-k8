@@ -1,0 +1,7 @@
+---
+- name: Deployment of app to remote host
+  hosts: uat
+  remote_user: azureuser
+  become: true
+  roles: 
+    - common
