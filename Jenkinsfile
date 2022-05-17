@@ -29,14 +29,14 @@ pipeline {
                 sh 'sudo docker ps -a'
             }
         }
-        stage('VerifyCurl') {
-            steps {
+        // stage('VerifyCurl') {
+        //     steps {
                 
-                echo 'Verify using curl'
-                sh 'curl localhost:5000'
+        //         echo 'Verify using curl'
+        //         sh 'curl localhost:5000'
                 
-            }
-        }
+        //     }
+        // }
 
         stage ('Push to registry'){
         input{
@@ -61,8 +61,8 @@ pipeline {
             steps {
                 
                 sh  'echo $dockerhub_PSW | sudo docker login -u $dockerhub_USR  --password-stdin'
-                sh 'ssh genex@192.168.56.102 "echo $dockerhub_PSW | docker login -u $dockerhub_USR  --password-stdin && sudo docker pull g3nex/flask-app" '
-                sh 'ssh genex@192.168.56.102 "sudo docker run -it --rm -d -p 5000:5000 --name app flask-app-deploy" '
+                sh 'ssh genex@192.168.56.102 "echo $dockerhub_PSW |sudo docker login -u $dockerhub_USR  --password-stdin && sudo docker pull g3nex/flask-app" '
+                sh 'ssh genex@192.168.56.102 "sudo docker run -it --rm -d -p 5000:5000 --name flask-app g3nex/flask-app" '
                 echo 'Test Verify on the remote host'
                 sh 'curl http://192.168.56.102:5000'
                 
