@@ -49,7 +49,8 @@ stages:
         echo "---" >$(System.DefaultWorkingDirectory)/sftp_roles/group_vars/all
         echo -e "dockerhub_pwd: "$(dockerhub_pwd) >> $(System.DefaultWorkingDirectory)/sftp_roles/group_vars/all
         echo -e "dockerhub_usr: "$(dockerhub_usr) >> $(System.DefaultWorkingDirectory)/sftp_roles/group_vars/all        
-        ansible-playbook deploy-app-agent.yml -t "verifycontainer, curl" -i hosts.ini
+
+        ansible-playbook app-deployment-azure-ansible/deploy-app-agent.yml -t "verifycontainer, curl" -i hosts.ini
     
       displayName: 'provision_deploy'
 
