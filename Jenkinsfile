@@ -10,6 +10,8 @@ pipeline {
             steps {
 
                 sh 'cd /var/lib/jenkins/workspace/jenkins-pipeline/ && rm -rf *'
+                // sh 'sudo docker stop flask-app && sudo docker rm flask-app'
+                // sh 'ssh genex@192.168.56.102 "sudo docker stop flask-app && sudo docker rm flask-app" '
                 
             }
         }
@@ -64,6 +66,7 @@ pipeline {
                 sh 'ssh genex@192.168.56.102 "echo $dockerhub_PSW |sudo docker login -u $dockerhub_USR  --password-stdin && sudo docker pull g3nex/flask-app" '
                 sh 'ssh genex@192.168.56.102 "sudo docker run -it --rm -d -p 5000:5000 --name flask-app g3nex/flask-app" '
                 echo 'Test Verify on the remote host'
+                sh 'sleep 30'
                 sh 'curl http://192.168.56.102:5000'
                 
             }
