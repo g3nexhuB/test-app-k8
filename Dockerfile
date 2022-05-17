@@ -1,5 +1,5 @@
 FROM python:3.7
 COPY . /tmp
-RUN pip3 install Flask
+RUN pip install -r requirements.txt 
 EXPOSE 5000
-CMD ["python3", "/tmp/main.py"]
+CMD ["python3", "flask-app/app.py"]
