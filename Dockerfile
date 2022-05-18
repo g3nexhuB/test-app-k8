@@ -1,8 +1,9 @@
 FROM python:3.7
 COPY . /tmp
-RUN  adduser --disabled-password --gecos "" flask_user
+RUN useradd -ms /bin/bash flask_user
 USER flask_user
-COPY requirements.txt flask-app/requirements.txt 
-RUN pip install --upgrade pip && pip install -r flask-app/requirements.txt 
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt
+RUN pip install Flask
 EXPOSE 5000
-CMD ["python3", "flask-app/app.py"]
+CMD ["python3", "/tmp/flask-app/app.py"]
